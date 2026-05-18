@@ -28,6 +28,10 @@
 #include "Util.h"
 #include <algorithm>
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE),
     _accessoriesInstalled(false)
@@ -387,6 +391,16 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         else
             _me->SetNpcFlag(_me->IsPlayer() ?  UNIT_NPC_FLAG_PLAYER_VEHICLE : UNIT_NPC_FLAG_SPELLCLICK);
     }
+        //npcbot: do not allow other passengers on bot vehicles
+        if (unit->IsNPCBot()/* &&
+            (Seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)*/)
+        {
+            if (_me->GetTypeId() == TYPEID_PLAYER)
+                _me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
+            else
+                _me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+        }
+        //end npcbot
 
     if (!_me || !_me->IsInWorld() || _me->IsDuringRemoveFromWorld())
         return false;
@@ -412,6 +426,11 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     unit->m_movementInfo.transport.seat = seat->first;
     unit->m_movementInfo.transport.guid = _me->GetGUID();
 
+    //npcbot
+    if (unit->GetTypeId() == TYPEID_UNIT && unit->ToCreature()->GetBotAI())
+        BotMgr::OnBotEnterVehicle(unit->ToCreature(), this);
+    //end npcbot
+
     // xinef: removed seat->first == 0 check...
     if (_me->IsCreature()
             && unit->IsPlayer()
@@ -432,7 +451,13 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
             LOG_INFO("vehicles", "Crash recovered in Unit::SetCharmedBy(). Unit {}, typeid: {}, in world: {}, duringremove: {} has wrong CharmType! Charmer {}, typeid: {}, in world: {}, duringremove: {}.", _me->GetName(), _me->GetTypeId(), _me->IsInWorld(), _me->IsDuringRemoveFromWorld(), unit->GetName(), unit->GetTypeId(), unit->IsInWorld(), unit->IsDuringRemoveFromWorld());
             return false;
         }
+
+        //npcbot
+        if (unit->ToPlayer()->HaveBot())
+            BotMgr::OnBotOwnerEnterVehicle(unit->ToPlayer(), this);
+        //end npcbot
     }
+
 
     if (_me->IsInWorld())
     {
@@ -624,8 +649,16 @@ void Vehicle::InitMovementInfoForBase()
 }
 
 VehicleSeatEntry const* Vehicle::GetSeatForPassenger(Unit const* passenger)
+//npcbot
+const
+//end npcbot
 {
+    //npcbot
+    /*
     SeatMap::iterator itr;
+    */
+    SeatMap::const_iterator itr;
+    //end npcbot
     for (itr = Seats.begin(); itr != Seats.end(); ++itr)
         if (itr->second.Passenger.Guid == passenger->GetGUID())
             return itr->second.SeatInfo;
