@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-SRC="$(dirname $0)"
+SRC="$( cd "$( dirname $0 )/../.." && pwd )"
 DEST="/home/acore/server"
 BUILD="$SRC/build"
 JOBS="$(nproc --all)"
@@ -28,8 +28,5 @@ sudo rsync -a --delete "$SRC/data/" "$DEST/source/data/"
 
 echo "==> Fixing ownership"
 sudo chown -R acore:acore "$DEST"
-
-echo "==> Restarting services"
-sudo systemctl restart azerothcore-auth azerothcore-world
 
 echo "==> Done"
