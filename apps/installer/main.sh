@@ -46,6 +46,9 @@ menu_items=(
     "version|v|Show AzerothCore version"
     "service-manager|sm|Run service manager to run authserver and worldserver in background"
     "config|cf|Configuration manager"
+    "local-deploy|ld|Local deploy"
+    "up|su|Service up"
+    "down|sd|Service down"
     "quit|q|Exit from this menu"
 )
 
@@ -103,6 +106,15 @@ function handle_menu_command() {
             ;;
         "config")
             bash "$AC_PATH_APPS/installer/includes/config/config-main.sh" "$@"
+            ;;
+        "local-deploy")
+            bash "$AC_PATH_APPS/local-deploy/local-deploy.sh" "$@"
+            ;;
+        "up")
+            bash "$AC_PATH_APPS/local-deploy/up.sh" "$@"
+            ;;
+        "down")
+            bash "$AC_PATH_APPS/local-deploy/down.sh" "$@"
             ;;
         "quit")
             echo "Goodbye!"
