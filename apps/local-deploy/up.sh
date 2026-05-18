@@ -11,6 +11,7 @@ echo "==> Starting DB..."
 docker start ac-wow-mysql
 
 echo "==> Starting services..."
-sudo systemctl start azerothcore-auth azerothcore-world
+sudo systemctl start azerothcore-auth.service
+sudo systemctl start azerothcore-world.service
 
 echo "==> Done"

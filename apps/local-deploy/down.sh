@@ -8,7 +8,8 @@ set -euo pipefail
 sudo -v
 
 echo "==> Shutting down services..."
-sudo systemctl stop azerothcore-auth azerothcore-world
+sudo systemctl stop azerothcore-world.service
+sudo systemctl stop azerothcore-auth.service
 
 echo "==> Shutting down DB..."
 docker stop ac-wow-mysql
