@@ -59,6 +59,7 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool() :
 {
     WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
 
+#ifndef MARIADB_BASE_VERSION
     bool isSupportClientDB = mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION;
     bool isSameClientDB = mysql_get_client_version() == MYSQL_VERSION_ID;
 
@@ -66,6 +67,7 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool() :
         mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
     WPFatal(isSameClientDB, "Used MySQL library version ({} id {}) does not match the version id used to compile AzerothCore (id {}).\nSearch the wiki for ACE00046 in Common Errors (https://www.azerothcore.org/wiki/common-errors#ace00046).",
         mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
+#endif
 }
 
 template <class T>

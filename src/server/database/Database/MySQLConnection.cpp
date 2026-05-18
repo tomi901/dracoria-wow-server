@@ -127,6 +127,7 @@ uint32 MySQLConnection::Open()
     }
 #endif
 
+#ifndef MARIADB_BASE_VERSION
     if (m_connectionInfo.ssl != "")
     {
         mysql_ssl_mode opt_use_ssl = SSL_MODE_DISABLED;
@@ -137,6 +138,7 @@ uint32 MySQLConnection::Open()
 
         mysql_options(mysqlInit, MYSQL_OPT_SSL_MODE, (char const*)&opt_use_ssl);
     }
+#endif
 
     m_Mysql = reinterpret_cast<MySQLHandle*>(mysql_real_connect(mysqlInit, m_connectionInfo.host.c_str(), m_connectionInfo.user.c_str(),
         m_connectionInfo.password.c_str(), m_connectionInfo.database.c_str(), port, unix_socket, 0));
@@ -216,7 +218,7 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
 
     uint32 _s = getMSTime();
 
-#if MYSQL_VERSION_ID >= 80300
+#if MYSQL_VERSION_ID >= 80300 && !defined(MARIADB_BASE_VERSION)
     if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
 #else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
@@ -268,7 +270,7 @@ bool MySQLConnection::_Query(PreparedStatementBase* stmt, MySQLPreparedStatement
 
     uint32 _s = getMSTime();
 
-#if MYSQL_VERSION_ID >= 80300
+#if MYSQL_VERSION_ID >= 80300 && !defined(MARIADB_BASE_VERSION)
     if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
 #else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
