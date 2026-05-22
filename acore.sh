@@ -2,7 +2,9 @@
 
 [ -z "$WITH_ERRORS" ] && set -e
 
-CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+egrep() { grep -E "$@"; }
+export -f egrep
 
+CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "$CUR_PATH/apps/installer/main.sh"
