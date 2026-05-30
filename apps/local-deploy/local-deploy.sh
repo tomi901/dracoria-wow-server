@@ -26,6 +26,18 @@ sudo make -C "$BUILD" install
 echo "==> Syncing source data tree to $DEST/source"
 sudo rsync -a --delete "$SRC/data/" "$DEST/source/data/"
 
+# Modules ship their own data/ tree (SQL the DB updater applies at startup,
+# resolved via <source>/modules/<mod>). `make install` doesn't place these,
+# so sync each module's data/ dir into the install's source tree.
+echo "==> Syncing module data trees to $DEST/source/modules"
+for mod_data in "$SRC"/modules/*/data; do
+  [ -d "$mod_data" ] || continue
+  mod_name="$(basename "$(dirname "$mod_data")")"
+  echo "    - $mod_name"
+  sudo mkdir -p "$DEST/source/modules/$mod_name"
+  sudo rsync -a --delete "$mod_data/" "$DEST/source/modules/$mod_name/data/"
+done
+
 echo "==> Fixing ownership"
 sudo chown -R acore:acore "$DEST"
 
