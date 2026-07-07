@@ -16,6 +16,9 @@ CHARACTER_DUMP_OPTS="--ignore-table=acore_characters.logs --ignore-table=acore_c
 mariadb-dump $DUMP_OPTS $CHARACTER_DUMP_OPTS "acore_characters" \
       | zstd -19 -T0 -o "$DEST/acore_characters-${STAMP}.sql.zst"
 
-# We will rarely need world content backups
-#mariadb-dump $DUMP_OPTS "acore_world" \
-#      | zstd -19 -T0 -o "$DEST/acore_auth-${STAMP}.sql.zst"
+# We will rarely need world content and playerbots backups
+mariadb-dump $DUMP_OPTS "acore_world" \
+      | zstd -19 -T0 -o "$DEST/acore_world-${STAMP}.sql.zst"
+
+mariadb-dump $DUMP_OPTS "acore_playerbots" \
+      | zstd -19 -T0 -o "$DEST/acore_playerbots-${STAMP}.sql.zst"
